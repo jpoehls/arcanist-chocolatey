@@ -2,41 +2,31 @@
 <!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
-    <!-- Read this before publishing packages to chocolatey.org: https://github.com/chocolatey/chocolatey/wiki/CreatePackages -->
     <id>arcanist</id>
-    <title>Phabricator Arcanist</title>
-    <version>1.0.0</version>
+    <title>Arcanist</title>
+    <version>2016.10</version>
     <authors>Phabricator Authors</authors>
     <owners>Joshua Poehls</owners>
-    <!-- <summary>summary</summary> -->
     <description>
 Arcanist provides command-line access to many [Phabricator](https://secure.phabricator.com) tools (like Differential, Files, and Paste), integrates with static analysis ("lint") and unit tests, and manages common workflows like getting changes into Differential for review.
 
 A detailed command reference is available by running `arc help` after installation.
     </description>
-    <projectUrl>https://secure.phabricator.com/book/phabricator/article/arcanist/</projectUrl>
     <packageSourceUrl>https://github.com/jpoehls/arcanist-chocolatey</packageSourceUrl>
+    <projectUrl>https://phabricator.org</projectUrl>
     <licenseUrl>https://secure.phabricator.com/diffusion/ARC/browse/master/LICENSE</licenseUrl>
-    <!--
-    <packageSourceUrl></packageSourceUrl>
-    <projectSourceUrl></projectSourceUrl>
-    <docsUrl></docsUrl>
-    <mailingListUrl></mailingListUrl>
-    <bugTrackerUrl></bugTrackerUrl>
-	<licenseUrl></licenseUrl>-->
+    <docsUrl>https://secure.phabricator.com/book/phabricator/article/arcanist</docsUrl>
+    <bugTrackerUrl>https://secure.phabricator.com</bugTrackerUrl>
+    <projectSourceUrl>https://secure.phabricator.com/diffusion/ARC</projectSourceUrl>
     <tags>phabricator arcanist admin</tags>
-    <copyright></copyright>
-    
+    <copyright>
+    </copyright>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <!--<iconUrl>http://cdn.rawgit.com/__REPLACE_YOUR_REPO__/master/icons/choco-arcanist.png</iconUrl>-->
-    <!--<dependencies>
-      <dependency id="" version="__VERSION__" />
-      <dependency id="" />
-    </dependencies>-->
     <dependencies>
-    	<dependency id="php" />
+      <dependency id="php" version="5.2" />
     </dependencies>
-    <!-- <releaseNotes>__REPLACE_OR_REMOVE__MarkDown_Okay</releaseNotes> -->
+    <releaseNotes>Read Phabricator's changelog for [2016 Week 10 (Early March)](https://secure.phabricator.com/w/changelog/2016.10/).</releaseNotes>
     <!--<provides></provides>-->
   </metadata>
   <files>
