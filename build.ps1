@@ -77,12 +77,14 @@ if (-not (Test-GitHubCommit -Owner phacility -Repo libphutil -Sha $release.PhuRe
     throw "arcanist commit not found on GitHub: $($release.ArcRevision)"
 }
 Write-Output "Building chocolateyInstall.ps1..."
-$chocolateyInstallTemplate = Get-Content .\chocolateyInstall.template.ps1 -Raw
-$chocolateyInstallTemplate = $chocolateyInstallTemplate.Replace("#ArcDownloadUrl#", $release.ArcDownloadUrl)
-$chocolateyInstallTemplate = $chocolateyInstallTemplate.Replace("#PhuDownloadUrl#", $release.PhuDownloadUrl)
-$chocolateyInstallTemplate = $chocolateyInstallTemplate.Replace("#ArcRevision#", $release.ArcRevision)
-$chocolateyInstallTemplate = $chocolateyInstallTemplate.Replace("#PhuRevision#", $release.PhuRevision)
-$chocolateyInstallTemplate | Out-File .\tools\chocolateyInstall.ps1 -Encoding utf8
+@"
+`$ArcDownloadUrl = '$($release.ArcDownloadUrl)'
+`$PhuDownloadUrl = '$($release.PhuDownloadUrl)'
+`$ArcRevision = '$($release.ArcRevision)'
+`$PhuRevision = '$($release.PhuRevision)'
+
+$((Get-Content .\chocolateyInstall.template.ps1 -Raw).Trim())
+"@ | Out-File .\tools\chocolateyInstall.ps1 -Encoding utf8
 
 $nuspec = Join-Path (Split-Path $PSCommandPath) 'arcanist.nuspec'
 Write-Output "Updating $(Split-Path $nuspec -Leaf)..."
