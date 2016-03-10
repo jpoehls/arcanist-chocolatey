@@ -74,7 +74,7 @@ if (-not (Test-GitHubCommit -Owner phacility -Repo arcanist -Sha $release.ArcRev
     throw "arcanist commit not found on GitHub: $($release.ArcRevision)"
 }
 if (-not (Test-GitHubCommit -Owner phacility -Repo libphutil -Sha $release.PhuRevision)) {
-    throw "arcanist commit not found on GitHub: $($release.ArcRevision)"
+    throw "libphutil commit not found on GitHub: $($release.PhuRevision)"
 }
 Write-Output "Building chocolateyInstall.ps1..."
 @"
