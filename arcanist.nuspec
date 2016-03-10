@@ -13,7 +13,7 @@ Arcanist provides command-line access to many [Phabricator](https://secure.phabr
 A detailed command reference is available by running `arc help` after installation.
     </description>
     <packageSourceUrl>https://github.com/jpoehls/arcanist-chocolatey</packageSourceUrl>
-    <projectUrl>https://phabricator.org</projectUrl>
+    <projectUrl>http://phabricator.org</projectUrl>
     <licenseUrl>https://secure.phabricator.com/diffusion/ARC/browse/master/LICENSE</licenseUrl>
     <docsUrl>https://secure.phabricator.com/book/phabricator/article/arcanist</docsUrl>
     <bugTrackerUrl>https://secure.phabricator.com</bugTrackerUrl>
