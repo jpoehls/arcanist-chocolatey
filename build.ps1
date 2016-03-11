@@ -61,21 +61,57 @@ function Test-GitHubCommit {
     return ($resp -and $resp.StatusCode -eq 200)
 }
 
-function Get-CommitZip {
+function Get-GitHubDownloadUrl {
     param(
         [string]$Owner,
         [string]$Repo,
         [string]$Sha
     )
 
-    $url = "https://github.com/$Owner/$Repo/archive/$Sha.zip"
-    $relFile = "tools/$Repo.zip"
-    $file = (Join-Path (Split-Path $PSCommandPath) $relFile)
+    return "https://github.com/$Owner/$Repo/archive/$Sha.zip"
+}
+
+function Get-CommitZip {
+    param(
+        [string]$Url,
+        [string]$Target
+    )
+
+    $file = (Join-Path (Split-Path $PSCommandPath) $Target)
     
-    Write-Output "   URL: $url"
-    Invoke-WebRequest -Uri $url -OutFile $file
-    Write-Output "  FILE: $relFile"
+    Write-Output "   URL: $Url"
+    Invoke-WebRequest -Uri $Url -OutFile $file
+    Write-Output "  FILE: $Target"
     Write-Output "   MD5: $((Get-FileHash $file -Algorithm MD5).Hash.ToLower())"
+}
+
+function New-VerificationFile {
+    param(
+        [string]$ArcDownloadUrl,
+        [string]$PhuDownloadUrl,
+        [string]$ReleaseName,
+        [string]$ChangelogUrl,
+        [string]$PackageVersion
+    )
+    
+    $txt = @"
+VERIFICATION.TXT is intended to assist the Chocolatey moderators and community
+in verifying that this package's contents are trustworthy.
+
+The following package files can be verified by comparing a hash of their content
+to hash of the file available at the corresponding download URL.
+
+These download URLs are what we assert to be the trusted source for those files.
+
+    tools/arcanist.zip: $ArcDownloadUrl
+    tools/libputil.zip: $PhuDownloadUrl
+
+These commits were packaged as version $PackageVersion ($ReleaseName)
+based on the Phabricator changelog at $ChangelogUrl
+"@
+
+    $outfile = "tools/verification.txt"
+    $txt | Out-File $outfile -Encoding utf8
 }
 
 Write-Output "Getting latest Phabricator release info..."
@@ -84,10 +120,15 @@ Write-Output $release
 Write-Output ""
 
 Write-Output "Downloading arcanist..."
-Get-CommitZip -Owner phacility -Repo arcanist -Sha $release.ArcRevision
+$arcDownloadUrl = Get-GitHubDownloadUrl -Owner phacility -Repo arcanist -Sha $release.ArcRevision 
+Get-CommitZip -Url $arcDownloadUrl -Target "tools/arcanist.zip"
 
 Write-Output "Downloading libphutil..."
-Get-CommitZip -Owner phacility -Repo libphutil -Sha $release.PhuRevision
+$phuDownloadUrl = Get-GitHubDownloadUrl -Owner phacility -Repo libphutil -Sha $release.PhuRevision
+Get-CommitZip -Url $phuDownloadUrl -Target "tools/libphutil.zip"
+
+Write-Output "Writing verification.txt..."
+New-VerificationFile -ArcDownloadUrl $arcDownloadUrl -PhuDownloadUrl $phuDownloadUrl -ReleaseName $release.ReleaseName -ChangelogUrl $release.ChangelogUrl -PackageVersion $release.Version
 
 $releaseNotes = @"
 Read Phabricator's changelog for [$($release.ReleaseName)]($($release.ChangelogUrl)).
