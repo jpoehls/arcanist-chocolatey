@@ -68,7 +68,14 @@ function Get-CommitZip {
         [string]$Sha
     )
 
-    Invoke-WebRequest -Uri "https://github.com/$Owner/$Repo/archive/$Sha.zip" -OutFile (Join-Path (Split-Path $PSCommandPath) "tools/$Repo.zip")
+    $url = "https://github.com/$Owner/$Repo/archive/$Sha.zip"
+    $relFile = "tools/$Repo.zip"
+    $file = (Join-Path (Split-Path $PSCommandPath) $relFile)
+    
+    Write-Output "   URL: $url"
+    Invoke-WebRequest -Uri $url -OutFile $file
+    Write-Output "  FILE: $relFile"
+    Write-Output "   MD5: $((Get-FileHash $file -Algorithm MD5).Hash.ToLower())"
 }
 
 Write-Output "Getting latest Phabricator release info..."
