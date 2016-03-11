@@ -82,11 +82,18 @@ Get-CommitZip -Owner phacility -Repo arcanist -Sha $release.ArcRevision
 Write-Output "Downloading libphutil..."
 Get-CommitZip -Owner phacility -Repo libphutil -Sha $release.PhuRevision
 
+$releaseNotes = @"
+Read Phabricator's changelog for [$($release.ReleaseName)]($($release.ChangelogUrl)).
+
+Bundles arcanist revision [$($release.ArcRevision.Substring(0,12))](https://secure.phabricator.com/diffusion/ARC/history/master/;$($release.ArcRevision))
+and libphutil revision [$($release.PhuRevision.Substring(0,12))](https://secure.phabricator.com/diffusion/PHU/history/master/;$($release.PhuRevision)).
+"@
+
 $nuspec = Join-Path (Split-Path $PSCommandPath) 'arcanist.nuspec'
 Write-Output "Updating $(Split-Path $nuspec -Leaf)..."
 Update-NuSpec -Path $nuspec `
               -Version $release.Version `
-              -ReleaseNotes "Read Phabricator's changelog for [$($release.ReleaseName)]($($release.ChangelogUrl))."
+              -ReleaseNotes $releaseNotes
 
 Write-Output "Packing..."
 choco pack $nuspec
