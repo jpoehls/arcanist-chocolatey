@@ -5,8 +5,7 @@ function Update-NuSpec {
     param(
         [string]$Path,
         [string]$Version,
-        [string]$ReleaseName,
-        [string]$ChangeLogUrl
+        [string]$ReleaseNotes
     )
 
     $ns = @{ nuspec = 'http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd' }
@@ -16,7 +15,7 @@ function Update-NuSpec {
     $el.Node.InnerText = $Version
 
     $el = $xml | Select-Xml -XPath '/nuspec:package/nuspec:metadata/nuspec:releaseNotes' -Namespace $ns
-    $el.Node.InnerText = "Read Phabricator's changelog for [$ReleaseName]($ChangelogUrl)."
+    $el.Node.InnerText = $ReleaseNotes
 
     $xml.Save($Path)
 }
@@ -46,9 +45,7 @@ function Get-PhabLatestRelease {
         "ReleaseName" = $releaseName;
         "Version" = $version;
         "ArcRevision" = $arcRevision;
-        "ArcDownloadUrl" = "https://github.com/phacility/arcanist/archive/$arcRevision.zip";
         "PhuRevision" = $phuRevision;
-        "PhuDownloadUrl" = "https://github.com/phacility/libphutil/archive/$phuRevision.zip";
         "ChangelogUrl" = $changelogUri.ToString();
     }
 }
@@ -64,34 +61,32 @@ function Test-GitHubCommit {
     return ($resp -and $resp.StatusCode -eq 200)
 }
 
+function Get-CommitZip {
+    param(
+        [string]$Owner,
+        [string]$Repo,
+        [string]$Sha
+    )
+
+    Invoke-WebRequest -Uri "https://github.com/$Owner/$Repo/archive/$Sha.zip" -OutFile (Join-Path (Split-Path $PSCommandPath) "tools/$Repo.zip")
+}
+
 Write-Output "Getting latest Phabricator release info..."
 $release = Get-PhabLatestRelease
 Write-Output $release
 Write-Output ""
 
-Write-Output "Checking GitHub for release commits..."
-if (-not (Test-GitHubCommit -Owner phacility -Repo arcanist -Sha $release.ArcRevision)) {
-    throw "arcanist commit not found on GitHub: $($release.ArcRevision)"
-}
-if (-not (Test-GitHubCommit -Owner phacility -Repo libphutil -Sha $release.PhuRevision)) {
-    throw "libphutil commit not found on GitHub: $($release.PhuRevision)"
-}
-Write-Output "Building chocolateyInstall.ps1..."
-@"
-`$ArcDownloadUrl = '$($release.ArcDownloadUrl)'
-`$PhuDownloadUrl = '$($release.PhuDownloadUrl)'
-`$ArcRevision = '$($release.ArcRevision)'
-`$PhuRevision = '$($release.PhuRevision)'
+Write-Output "Downloading arcanist..."
+Get-CommitZip -Owner phacility -Repo arcanist -Sha $release.ArcRevision
 
-$((Get-Content .\chocolateyInstall.template.ps1 -Raw).Trim())
-"@ | Out-File .\tools\chocolateyInstall.ps1 -Encoding utf8
+Write-Output "Downloading libphutil..."
+Get-CommitZip -Owner phacility -Repo libphutil -Sha $release.PhuRevision
 
 $nuspec = Join-Path (Split-Path $PSCommandPath) 'arcanist.nuspec'
 Write-Output "Updating $(Split-Path $nuspec -Leaf)..."
 Update-NuSpec -Path $nuspec `
               -Version $release.Version `
-              -ReleaseName $release.ReleaseName `
-              -ChangelogUrl $release.ChangelogUrl
+              -ReleaseNotes "Read Phabricator's changelog for [$($release.ReleaseName)]($($release.ChangelogUrl))."
 
 Write-Output "Packing..."
 choco pack $nuspec

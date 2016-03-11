@@ -1,15 +1,25 @@
-﻿$ArcDownloadUrl = 'https://github.com/phacility/arcanist/archive/3876d9358390ee9a6290689ca38d8a1e972233b8.zip'
-$PhuDownloadUrl = 'https://github.com/phacility/libphutil/archive/ad3f475c8c13e22096c8c3c60df5f3d886483699.zip'
-$ArcRevision = '3876d9358390ee9a6290689ca38d8a1e972233b8'
-$PhuRevision = 'ad3f475c8c13e22096c8c3c60df5f3d886483699'
+﻿$installDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
-$installDir = Split-Path -parent $MyInvocation.MyCommand.Definition
- 
-Install-ChocolateyZipPackage 'arcanist' $ArcDownloadUrl $installDir
-Install-ChocolateyZipPackage 'libphutil' $PhuDownloadUrl $installDir
+Get-ChocolateyUnzip (Join-Path $installDir "arcanist.zip") $installDir
+Get-ChocolateyUnzip (Join-Path $installDir "libphutil.zip") $installDir
 
-# Add the 'arc' command to the PATH.
-Install-ChocolateyPath (Join-Path $installDir "arcanist-$ArcRevision\bin")
+# Ignore any EXEs that happen to be in those ZIPs.
+$files = Get-ChildItem $installDir -Include *.exe -Recurse
+foreach ($file in $files) {
+  # generate an ignore file
+  New-Item "$file.ignore" -type file -force | Out-Null
+}
+
+$arcDir = (Get-ChildItem (Join-Path $installDir "arcanist-*") | select -First 1).Name
+$phuDir = (Get-ChildItem (Join-Path $installDir "libphutil-*") | select -First 1).Name
+
+# Create an arc.bat script that will forward to the arc.bat
+# included in arcanist's bin directory.
+# This will be the "arc" command added to the PATH by Chocolatey.
+@"
+@echo off
+"%~dp0arcanist-$arcDir\bin\arc.cmd" %*
+"@ | Out-File "$installDir/arc.bat" -Encoding ascii
 
 # Symlink libphutil into arcanist's externals\includes folder.
-Start-ChocolateyProcessAsAdmin "cmd /C mklink /D `"$(Join-Path $installDir "arcanist-$ArcRevision\externals\includes\libphutil")`" `"$(Join-Path $installDir "libphutil-$PhuRevision")`""
+Start-ChocolateyProcessAsAdmin "cmd /C mklink /D `"$(Join-Path $installDir "$arcDir\externals\includes\libphutil")`" `"$(Join-Path $installDir $phuDir)`""
