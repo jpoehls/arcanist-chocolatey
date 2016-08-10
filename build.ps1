@@ -137,11 +137,15 @@ Bundles arcanist revision [$($release.ArcRevision.Substring(0,12))](https://secu
 and libphutil revision [$($release.PhuRevision.Substring(0,12))](https://secure.phabricator.com/diffusion/PHU/history/master/;$($release.PhuRevision)).
 "@
 
+$version = $release.Version
 $nuspec = Join-Path (Split-Path $PSCommandPath) 'arcanist.nuspec'
 Write-Output "Updating $(Split-Path $nuspec -Leaf)..."
 Update-NuSpec -Path $nuspec `
-              -Version $release.Version `
+              -Version $version `
               -ReleaseNotes $releaseNotes
 
 Write-Output "Packing..."
 choco pack $nuspec
+
+$nupkg = "arcanist.$version.nupkg"
+Write-Output "Done. Publish:`n`n    choco push $nupkg`n`nOr test:`n`n    choco install $nupkg -y`n"
