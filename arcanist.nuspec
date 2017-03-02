@@ -4,7 +4,7 @@
   <metadata>
     <id>arcanist</id>
     <title>Arcanist</title>
-    <version>2016.32</version>
+    <version>2017.08</version>
     <authors>Phabricator Authors</authors>
     <owners>Joshua Poehls</owners>
     <summary>Arcanist provides command-line access to Phabricator.</summary>
@@ -25,10 +25,10 @@ A detailed command reference is available by running `arc help` after installati
     <dependencies>
       <dependency id="php" version="5.2" />
     </dependencies>
-    <releaseNotes>Read Phabricator's changelog for [2016 Week 32 (Early August)](https://secure.phabricator.com/w/changelog/2016.32/).
+    <releaseNotes>Read Phabricator's changelog for [2017 Week 8 (Very Late February)](https://secure.phabricator.com/w/changelog/2017.08/).
 
-Bundles arcanist revision [e5be662d15a8](https://secure.phabricator.com/diffusion/ARC/history/master/;e5be662d15a85776303aa06265578166762604ea)
-and libphutil revision [8b2800566ab9](https://secure.phabricator.com/diffusion/PHU/history/master/;8b2800566ab972b83307cab8073ca62312d1b0cb).</releaseNotes>
+Bundles arcanist revision [3b6b523c2b23](https://secure.phabricator.com/diffusion/ARC/history/master/;3b6b523c2b236e3724a1e115f126cb6fd05fa128)
+and libphutil revision [0625e4d28b16](https://secure.phabricator.com/diffusion/PHU/history/master/;0625e4d28b16cba8b0154e49dc31845559b4e704).</releaseNotes>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />
